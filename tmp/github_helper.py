@@ -13,8 +13,8 @@ LOG = logging.getLogger(__name__)
 
 
 class GitHubClient(object):
-    def __init__(self, repo: str, token=None, timeout_sec=10):
-        self._base_url = f'https://dsgithub.trendmicro.com/api/v3/repos/deep-security/{repo}/'
+    def __init__(self, repo: str, github_ee=None, token=None, timeout_sec=10):
+        self._base_url = self._define_base_url(github_ee, repo)
         self._session = requests.Session()
         self._token = token
         self._timeout_sec = timeout_sec
@@ -51,6 +51,14 @@ class GitHubClient(object):
             tag_data = {'name': tag['name'],
                         'commit_id': tag['commit']['sha']}
             yield tag_data
+
+    def _define_base_url(self, github_ee, repo):
+        if github_ee is None:
+            LOG.info('Connect to MGCP Github EE')
+            return f'https://adc.github.trendmicro.com/api/v3/repos/commercial-mgcp/{repo}/'
+        elif github_ee.upper() == 'DS':
+            LOG.info('Connect to DS Github EE')
+            return f'https://dsgithub.trendmicro.com/api/v3/repos/deep-security/{repo}/'
 
     @property
     def token(self):
@@ -290,9 +298,9 @@ if __name__ == '__main__':
     load_dotenv()
     logging.basicConfig(level=logging.DEBUG)
 
-    ee = GitHubClient(repo='v1-hub-plugin', token=os.getenv('github_ee_token'))
+    ee = GitHubClient(repo='v1-hub-plugin', github_ee='ds', token=os.getenv('github_ee_mgcp_token'))
     t = int(time.time())
-    pr_branch = f'test-pipeline-{t}'
+    pr_branch = f'auto-pr-{t}-trigger-by-mgcp-bot'
     master_branch = 'master'
     trigger_version = 'version.txt'
     content = f'v.1.0.207-{t}'
