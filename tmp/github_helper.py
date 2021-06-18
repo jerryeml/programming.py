@@ -6,12 +6,13 @@ import logging
 import requests
 from urllib.parse import urljoin
 from typing import List, Optional
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 
 
 LOG = logging.getLogger(__name__)
 
 
+# https://github.com/sebavenditti/github-automerger-script/blob/master/github-automerger.py
 class GitHubClient(object):
     def __init__(self, repo: str, github_ee=None, token=None, timeout_sec=10):
         self._base_url = self._define_base_url(github_ee, repo)
@@ -235,7 +236,7 @@ class GitHubClient(object):
     def get_file_sha(self, tree_sha: str, file_name: str) -> str:
         trees_info = self.get_trees(tree_sha)
         for file_info in trees_info['tree']:
-            print(file_info)
+            # print(file_info)
             if file_info['path'] == file_name:
                 return file_info['sha']
 
@@ -295,19 +296,19 @@ class GitHubClient(object):
 
 
 if __name__ == '__main__':
-    load_dotenv()
+    load_dotenv(".env")
     logging.basicConfig(level=logging.DEBUG)
 
-    ee = GitHubClient(repo='v1-hub-plugin', github_ee='ds', token=os.getenv('github_ee_mgcp_token'))
-    t = int(time.time())
-    pr_branch = f'auto-pr-{t}-trigger-by-mgcp-bot'
-    master_branch = 'master'
-    trigger_version = 'version.txt'
-    content = f'v.1.0.207-{t}'
+    # ee = GitHubClient(repo='v1-hub-plugin', github_ee='ds', token=os.getenv('github_ee_mgcp_token'))
+    # t = int(time.time())
+    # pr_branch = f'auto-pr-{t}-trigger-by-mgcp-bot'
+    # master_branch = 'master'
+    # trigger_version = 'version.txt'
+    # content = f'v.1.0.207-{t}'
     
-    master_sha = ee.get_branch_sha(master_branch)
-    ee.create_branch(pr_branch, hash=master_sha)
-    tree_sha = ee.get_branch_sha(pr_branch)
-    file_sha = ee.get_file_sha(tree_sha=tree_sha, file_name=trigger_version)
-    LOG.info(ee.create_file_contents(branch_name=pr_branch, path=trigger_version, file_hash=file_sha, content=content))
-    ee.create_pr(pr_branch, 'master')
+    # master_sha = ee.get_branch_sha(master_branch)
+    # ee.create_branch(pr_branch, hash=master_sha)
+    # tree_sha = ee.get_branch_sha(pr_branch)
+    # file_sha = ee.get_file_sha(tree_sha=tree_sha, file_name=trigger_version)
+    # LOG.info(ee.create_file_contents(branch_name=pr_branch, path=trigger_version, file_hash=file_sha, content=content))
+    # ee.create_pr(pr_branch, 'master')

@@ -1,3 +1,4 @@
 requests
 nose
 python-dotenv
+pycrypto==2.6.0
