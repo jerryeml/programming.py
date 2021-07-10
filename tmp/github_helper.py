@@ -290,25 +290,43 @@ class GitHubClient(object):
         response.raise_for_status()
         return
 
+    def comments_pr(self, pr_number , comment):
+        # 'https://adc.github.trendmicro.com/api/v3/repos/commercial-mgcp/app-vone-hub-agent/issues/3/comments'
+        
+        data = {
+            'body': comment
+        }
+        
+        req_url = urljoin(self._base_url, f'issues/{pr_number}/comments')
+
+        response = self._session.post(req_url, headers=self._headers(), json=data, timeout=self._timeout_sec)
+
+        response.raise_for_status()
+        return
+
     def close(self):
         if self._session:
             self._session.close()
 
 
-if __name__ == '__main__':
-    load_dotenv(".env")
-    logging.basicConfig(level=logging.DEBUG)
-
-    # ee = GitHubClient(repo='v1-hub-plugin', github_ee='ds', token=os.getenv('github_ee_mgcp_token'))
-    # t = int(time.time())
-    # pr_branch = f'auto-pr-{t}-trigger-by-mgcp-bot'
-    # master_branch = 'master'
-    # trigger_version = 'version.txt'
-    # content = f'v.1.0.207-{t}'
+def test_trigger_ds_ci():
+    ee = GitHubClient(repo='v1-hub-plugin', github_ee='ds', token=os.getenv('github_ee_mgcp_token'))
+    t = int(time.time())
     
+    pr_branch = f'auto-pr-{t}-trigger-by-mgcp-bot'
+    master_branch = 'master'
+    trigger_version = 'version.txt'
+    content = f'v.1.0.207-{t}'
+
     # master_sha = ee.get_branch_sha(master_branch)
     # ee.create_branch(pr_branch, hash=master_sha)
     # tree_sha = ee.get_branch_sha(pr_branch)
     # file_sha = ee.get_file_sha(tree_sha=tree_sha, file_name=trigger_version)
     # LOG.info(ee.create_file_contents(branch_name=pr_branch, path=trigger_version, file_hash=file_sha, content=content))
     # ee.create_pr(pr_branch, 'master')
+
+
+if __name__ == '__main__':
+    load_dotenv(".env")
+    logging.basicConfig(level=logging.DEBUG)
+    test_trigger_ds_ci()
