@@ -52,11 +52,18 @@ def upload_file(file_name, bucket, object_name=None):
     return True
 
 
-load_dotenv()
-# print(os.environ["AWS_DEFAULT_REGION"])
-access_key = os.environ["AWS_ACCESS_KEY_ID"]
-secret_access_key = os.environ["AWS_SECRET_ACCESS_KEY"]
-print(f"user access key: {access_key}")
-print(f"user secret access key: {secret_access_key}")
+if __name__ == "__main__":
+    load_dotenv()
+    print("Prepare to upload package to s3")
 
-upload_file(r"E:\Coding\side_project\poc\Python_Practice\tmp\upload_sample.txt", 's3-test-jy-source')
+    access_key = os.environ["AWS_ACCESS_KEY_ID"]
+    secret_access_key = os.environ["AWS_SECRET_ACCESS_KEY"]
+    AWS_SESSION_TOKEN = os.environ["AWS_SESSION_TOKEN"]
+    AWS_SECURITY_TOKEN = os.environ["AWS_SECURITY_TOKEN"] 
+
+    print("Get secret complete!")
+    package = os.path.join(os.getcwd(), 'upload_sample.txt')
+    print(f"uploading {package} to s3")
+
+    upload_file(r"upload_sample.txt", 'mgcp-ops-cloudtrail-bucket-us-east-1')
+    print("upload complete")
